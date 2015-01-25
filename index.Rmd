@@ -1,0 +1,63 @@
+---
+title       : Quick way to predict iris species 
+subtitle    : Use machine learning to blow away your peers
+author      : Li Jiang
+job         : Coursera learner
+framework   : io2012        # {io2012, html5slides, shower, dzslides, ...}
+highlighter : highlight.js  # {highlight.js, prettify, highlight}
+hitheme     : tomorrow      # 
+widgets     : []            # {mathjax, quiz, bootstrap}
+mode        : selfcontained # {standalone, draft}
+knit        : slidify::knit2slides
+---
+
+## Why create this app
+
+1. For botanist who want to study taxonomy 
+2. For people who enjoy knowing about iris species 
+3. For appreication of the power of machine learning 
+
+--- .class #id
+
+## Sizes of sepal and petal are useful parameters in predicting iris species
+
+As shown by the plot with sepal and petal width below, 3 iris species represented with 3 different colors are clearly separated, with little overlap.
+
+The size of sepal and petal are reliable parameters for predicting iris species 
+
+```{r,echo=FALSE,fig.width=5,fig.height=5}
+library(caret)
+library(rattle)
+library(rpart)
+data(iris)
+g<-ggplot(iris,aes(Petal.Width,Sepal.Width,colour=Species))
+g+geom_point(size=4)+
+  theme_classic()+
+  ggtitle("Petal and sepal width")+
+  xlab("Petal Width (cm)")+
+  ylab("length (cm)")+
+  theme(plot.title = element_text(size = rel(1.6)))+
+  theme(axis.title = element_text(size = rel(1.25)))
+  
+```
+
+--- .class #id
+
+## Predict iris species by decision tree
+```{r,echo=FALSE}
+inTrain <- createDataPartition(y=iris$Species,p=0.7,list=FALSE)
+training <- iris[inTrain,]
+testing <- iris[-inTrain,]
+modFit <- train(Species~., method="rpart",data=training)
+fancyRpartPlot(modFit$finalModel)
+```
+
+--- .class #id
+
+## Iris prediction by tree method is very accurate (accuracy=0.96) 
+
+```{r,echo=FALSE}
+pred <- predict(modFit,testing)
+result <- confusionMatrix(pred,testing[ ,5])
+result
+```
